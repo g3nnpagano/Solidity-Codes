@@ -1,0 +1,52 @@
+// SPDX-License-Identifier: MIT
+
+
+pragma solidity >=0.6.12 <0.9.0;
+
+contract IcoFashion {
+  // Variabili di stato
+    uint256 private totaleraccolto; // Saldo totale raccolto
+    uint256 private obiettivo; // Obiettivo della raccolta
+    uint private totaledonatori; // Numero totale di donatori
+    bool private conclusa; // Stato della raccolta (aperta o chiusa)
+    address private manager; // Indirizzo del manager della raccolta
+
+    // Inizializzazione del contratto con l'indirizzo del manager e l'obiettivo di raccolta
+    constructor(address _manager, uint _obiettivo) {
+        manager = _manager;
+        obiettivo = _obiettivo;
+    }
+    // Funzione per impostare lo stato della raccolta a "conclusa"
+    function setStatoRaccolta() public {
+        require(msg.sender == manager, "Solo il manager puo' chiudere la raccolta.");
+        conclusa = true;
+    }
+
+    // Funzione per verificare se l'obiettivo di raccolta è stato raggiunto
+    function checkObiettivo() public view returns(bool) {
+        return totaleraccolto >= obiettivo;
+    }
+
+    // Funzione interna per consentire al manager di prelevare i fondi raccolti
+    function prelevaFondi()  {
+        require(msg.sender == manager, "Solo il manager puo' prelevare i fondi.");
+        require(conclusa, "La raccolta deve essere prima conclusa.");
+        (bool callSuccess, ) = manager.call{value: totaleraccolto}("");
+        require(callSuccess, "Trasferimento fallito.");
+        totaleraccolto = 0; // Azzeramento del saldo raccolto dopo il prelievo
+    }
+
+    // Funzione pubblica per effettuare una donazione
+    function donazione() public payable {
+        require(!conclusa, "La raccolta fondi e' chiusa.");
+        require(msg.value > 0, "La donazione deve essere maggiore di zero.");
+        require(msg.sender.balance >= msg.value, "Fondi insufficienti per la donazione.");
+
+        totaleraccolto += msg.value; // Aggiornamento del saldo raccolto
+        totaledonatori++; // Incremento del numero di donatori
+    }
+}
+
+  
+   
+      
