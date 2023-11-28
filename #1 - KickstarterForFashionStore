@@ -27,7 +27,7 @@ contract IcoFashion {
         return totaleraccolto >= obiettivo;
     }
 
-    // Funzione interna per consentire al manager di prelevare i fondi raccolti
+    // Funzione per consentire al manager di prelevare i fondi raccolti
     function prelevaFondi()  {
         require(msg.sender == manager, "Solo il manager puo' prelevare i fondi.");
         require(conclusa, "La raccolta deve essere prima conclusa.");
